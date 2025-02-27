@@ -1,0 +1,28 @@
+[project]
+name = "research_console"
+version = "0"
+requires-python = "==3.12.*"
+dependencies = [
+  "fastapi", 
+  "granian", 
+  "stamina", 
+  "rich", 
+  "pypdf", 
+  "opencv-python", 
+  "matplotlib", 
+  "pdf2image", 
+  "pytesseract",
+  "spacy",
+  "langchain",
+  "pytextrank",
+  "chromadb",
+  "ollama",
+  "tqdm",
+]
+
+[dependency-groups]
+dev = ["fastapi[standard]", "pytest"]
+
+[build-system]
+requires = ["uv"]
+build-backend = "uv"
