@@ -327,6 +327,18 @@ class VectorSearchApp(App):
 
 
 def main():
+    if not os.path.exists("processed"):
+        os.makedirs("processed")
+        print("Folder 'processed' created.")
+    else:
+        print("Folder 'processed' already exists.")
+
+    if not os.path.exists("uploaded"):
+        os.makedirs("uploaded")
+        print("Folder 'uploaded' created.")
+    else:
+        print("Folder 'uploaded' already exists.")
+
     app = VectorSearchApp()
     app.run()
 
