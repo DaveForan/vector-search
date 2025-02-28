@@ -31,7 +31,7 @@ def pdf_to_images(filepath, title):
     This function converts the PDF page by page into
     JPEG files that will be used to scrape text.
     """
-    pages = convert_from_path(filepath, 400)
+    pages = convert_from_path(filepath, 150)
 
     i = 1
     for page in pages:

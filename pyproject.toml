@@ -18,6 +18,8 @@ dependencies = [
   "chromadb",
   "ollama",
   "tqdm",
+  "textual",
+  "textual-dev"
 ]
 
 [dependency-groups]

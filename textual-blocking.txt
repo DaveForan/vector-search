@@ -1,0 +1,41 @@
+To block until user input in Textual, one can utilize the Input widget along with an event handler. The Input widget allows users to enter text, and the application can be configured to wait for the user to press Enter before proceeding. Here's how it can be implemented:
+from textual.app import App, ComposeResult
+from textual.widgets import Header, Footer, Input
+from textual.containers import Container
+from textual.message import Message
+
+class UserInputApp(App):
+    """A Textual app that waits for user input."""
+
+    CSS_PATH = "input_example.tcss"
+
+    class InputSubmitted(Message):
+        """Message class to send input value."""
+        def __init__(self, value: str) -> None:
+            self.value = value
+            super().__init__()
+
+    def compose(self) -> ComposeResult:
+        """Create child widgets for the app."""
+        yield Header()
+        yield Container(Input(placeholder="Enter text and press Enter"))
+        yield Footer()
+
+    async def on_input_submitted(self, event: Input.Submitted) -> None:
+        """Handle input submitted event."""
+        await self.process_message(self.InputSubmitted(event.value))
+        self.query_one(Input).value = ""  # Clear the input field
+
+    async def on_user_input_app_input_submitted(self, event: InputSubmitted) -> None:
+         """Handle custom message with input value."""
+         self.exit(event.value) # Exit the app and return the value
+
+if __name__ == "__main__":
+    app = UserInputApp()
+    result = app.run()
+    print(f"User entered: {result}")
+
+In this example, the Input widget is placed within a Container. When the user presses Enter, the on_input_submitted event handler is triggered. This handler emits a custom message InputSubmitted with the input value, clears the input field, and then exits the app returning the entered value. The run method blocks until the app is exited, effectively waiting for the user input.
+
+Generative AI is experimental.
+

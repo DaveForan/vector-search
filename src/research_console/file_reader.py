@@ -15,15 +15,15 @@ class FileReader:
         self.publisher = None
         self.date_published = None
 
-    def input_metadata(self):
+    def input_metadata(self, title, authors, publisher, date_published):
         """
         Update the metadata associated with the document before
         writing to the database.
         """
-        self.title = input("Please enter title of document: ")
-        self.authors = input("Please enter authors name: ")
-        self.publisher = input("Please enter the publisher/journal name: ")
-        self.date_published = input("Please enter the date published: ")
+        self.title = title
+        self.authors = authors
+        self.publisher = publisher
+        self.date_published = date_published
         return
 
     def details(self):
