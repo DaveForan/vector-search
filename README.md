@@ -4,39 +4,73 @@
 
 To get this application running on a Macbook, you'll need to do the following
 
-1. Install (Brew)[https://brew.sh] for mac by running the following in your terminal:
+1. Install [Brew](https://brew.sh) for mac by running the following in your terminal:
 
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
-2. Install (Git)[https://git-scm.com/downloads/mac] by running the following in your terminal
+2. Install [Git](https://git-scm.com/downloads/mac) by running the following in your terminal
 
 ```bash
 brew install git
 ```
 
-3. Install (UV)[https://docs.astral.sh/uv/getting-started/installation/] by running the following in your terminal
+3. Install [UV](https://docs.astral.sh/uv/getting-started/installation/) by running the following in your terminal
 
 ```bash
 brew install uv
 ```
 
-4. Once those things are installed, create a Project folder from your root directory and navigate into it. After moving into the folder, clone this (repo)[https://github.com/RedSunDave/vector-search]
+4. Once those things are installed, create a Project folder from your root directory and navigate into it. After moving into the folder, clone this [repo](https://github.com/RedSunDave/vector-search)
+
+Change to root folder
 
 ```bash
 cd ~
+```
+
+Make a directory called Projects
+
+```bash
 mkdir Projects
+```
+
+Change into the directory
+
+```bash
 cd Projects
+```
+
+Clone this github repo / codebase
+
+```bash
 git clone https://github.com/RedSunDave/vector-search.git
+```
+
+Add the appropriate environmental variable to run UV to your .bashrc file
+
+```bash
 echo "export UV_PREVIEW=1" >> ~/.bashrc
+```
+
+Reload your .bashrc file
+
+```bash
 source ~/.bashrc
 ```
 
 5. You've downloaded the application. Now change into that folder and run the following commands to start it up.
 
+Change into the vector-search folder
+
 ```bash
 cd vector-search
+```
+
+Run the application
+
+```bash
 uv run src/vector_search/main.py
 ```
 
