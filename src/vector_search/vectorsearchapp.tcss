@@ -12,6 +12,11 @@ Input#vector-search {
   height: auto;
 }
 
+Button {
+  content-align: center middle;
+  margin: 1 0;
+}
+
 #results-container {
   background: $surface;
   margin: 0 0 1 0;

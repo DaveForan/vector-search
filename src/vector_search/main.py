@@ -37,11 +37,11 @@ SETTINGS_TEXT = """
 
 VectorSearch Application
 
-Press "a" to go to the search page. As you type, answers will appear from the database.
+Press "Ctrl + a" to go to the search page. As you type, answers will appear from the database.
 
-Press "s" to return to this page, the settings page. If you are in an input box these controls dont work.
+Press "Ctrl + s" to return to this page, the settings page. If you are in an input box these controls dont work.
 
-Press "d" to go to the processing page. There you can view files pending for processing and execute ingestion.
+Press "Ctrl + d" to go to the processing page. There you can view files pending for processing and execute ingestion.
 
 "Thanks for using my application, I hope you find it worthwhile."
 
@@ -79,6 +79,7 @@ class Settings(Screen):
 class Processing(Screen):
     """This is the screen used to ingest documents into the database"""
 
+    CSS_PATH = "vectorsearchapp.tcss"
     TITLE = "Processing"
     SUB_TITLE = """Ingest documents loaded in the "uploaded" folder"""
 
@@ -243,7 +244,7 @@ class VectorSearch(Screen):
     async def on_input_changed(self, message: Input.Changed) -> None:
         """A coroutine to handle a text changed message."""
         if message.value:
-            self.lookup_word(message.value)
+            self.run_worker(self.lookup_word(message.value), thread=True)
         else:
             # Clear the existing results
             await self.query_one("#results", Markdown).update("")
@@ -251,7 +252,15 @@ class VectorSearch(Screen):
     @work(exclusive=True)
     async def lookup_word(self, prompt: str) -> None:
         """Looks up a source"""
-        results = await query_documents(prompt)
+        results = await self.query_documents(prompt)
+
+        if not results:
+            results = [
+                {
+                    "citation": "N/A",
+                    "contents": "Currently there is no data loaded into the system. Please go to the processing page and scan uploaded files.",
+                }
+            ]
 
         if prompt == self.query_one(Input).value:
             markdown = self.make_word_markdown(results)
@@ -266,45 +275,44 @@ class VectorSearch(Screen):
 
         return "\n".join(lines)
 
+    async def query_documents(self, prompt: str):
+        """
+        Tool to get data from chronmadb and inject it into the history
+        """
+        _collection = _client.create_collection("library")
 
-async def query_documents(prompt: str):
-    """
-    Tool to get data from chronmadb and inject it into the history
-    """
-    _collection = _client.create_collection("library")
+        try:
+            # generate an embedding for the prompt and retrieve the most relevant doc
+            response = ollama.embeddings(prompt=prompt, model="nomic-embed-text")
 
-    try:
-        # generate an embedding for the prompt and retrieve the most relevant doc
-        response = ollama.embeddings(prompt=prompt, model="nomic-embed-text")
-
-        results = _collection.query(
-            query_embeddings=[response["embedding"]],
-            n_results=10,
-        )
-
-        data = results["documents"][0]
-        metadata = results["metadatas"][0]
-
-        data_list = []
-
-        for i, x in enumerate(data):
-            data_list.append(
-                {
-                    "unique_id": metadata[i]["unique_id"],
-                    "source": metadata[i]["source"],
-                    "authors": metadata[i]["authors"],
-                    "date_published": metadata[i]["date_published"],
-                    "publisher": metadata[i]["publisher"],
-                    "page": metadata[i]["page"],
-                    "citation": f"{metadata[i]["authors"]}({metadata[i]["date_published"]}) {metadata[i]["source"]}. Pgs. {metadata[i]["page"]}",
-                    "contents": data[i],
-                }
+            results = _collection.query(
+                query_embeddings=[response["embedding"]],
+                n_results=10,
             )
 
-        return data_list
+            data = results["documents"][0]
+            metadata = results["metadatas"][0]
 
-    except Exception as e:
-        print(e)
+            data_list = []
+
+            for i, x in enumerate(data):
+                data_list.append(
+                    {
+                        "unique_id": metadata[i]["unique_id"],
+                        "source": metadata[i]["source"],
+                        "authors": metadata[i]["authors"],
+                        "date_published": metadata[i]["date_published"],
+                        "publisher": metadata[i]["publisher"],
+                        "page": metadata[i]["page"],
+                        "citation": f"{metadata[i]["authors"]}({metadata[i]["date_published"]}) {metadata[i]["source"]}. Pgs. {metadata[i]["page"]}",
+                        "contents": data[i],
+                    }
+                )
+
+            return data_list
+
+        except Exception as e:
+            print(e)
 
 
 class VectorSearchApp(App):
@@ -312,9 +320,9 @@ class VectorSearchApp(App):
 
     SCREENS = {"vectorsearch": VectorSearch}
     BINDINGS = [
-        ("d", "switch_mode('processing')", "Processing"),
-        ("s", "switch_mode('settings')", "Settings"),
-        ("a", "switch_mode('vectorsearch')", "VectorSearch"),
+        ("ctrl+d", "switch_mode('processing')", "Processing"),
+        ("ctrl+s", "switch_mode('settings')", "Settings"),
+        ("ctrl+a", "switch_mode('vectorsearch')", "VectorSearch"),
     ]
     MODES = {
         "processing": Processing,
